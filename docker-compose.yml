@@ -1,0 +1,96 @@
+version: '3.9'
+
+services:
+  # ─── PostgreSQL ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ar_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stripe_ar_service
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: ar_redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ─── Backend ────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ar_api
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stripe_ar_service
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 24h
+      SALESFORCE_CLIENT_ID: ${SALESFORCE_CLIENT_ID}
+      SALESFORCE_CLIENT_SECRET: ${SALESFORCE_CLIENT_SECRET}
+      SALESFORCE_REDIRECT_URI: ${SALESFORCE_REDIRECT_URI}
+      SALESFORCE_INSTANCE_URL: ${SALESFORCE_INSTANCE_URL}
+      SALESFORCE_USERNAME: ${SALESFORCE_USERNAME}
+      SALESFORCE_PASSWORD: ${SALESFORCE_PASSWORD}
+      SALESFORCE_SECURITY_TOKEN: ${SALESFORCE_SECURITY_TOKEN}
+      NETSUITE_ACCOUNT_ID: ${NETSUITE_ACCOUNT_ID}
+      NETSUITE_CONSUMER_KEY: ${NETSUITE_CONSUMER_KEY}
+      NETSUITE_CONSUMER_SECRET: ${NETSUITE_CONSUMER_SECRET}
+      NETSUITE_TOKEN_KEY: ${NETSUITE_TOKEN_KEY}
+      NETSUITE_TOKEN_SECRET: ${NETSUITE_TOKEN_SECRET}
+      NETSUITE_BASE_URL: ${NETSUITE_BASE_URL}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM:-noreply@arservice.com}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-AR Service}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:3001}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+
+  # ─── Frontend (production build served by nginx) ─────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: ar_frontend
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

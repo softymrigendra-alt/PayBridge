@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OpportunityStatus {
+  PENDING
+  INVOICE_FETCHED
+  INVITE_SENT
+  ONBOARDING_COMPLETE
+  PAYMENT_PENDING
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  ERROR
+}
+
+enum InvoiceStatus {
+  OPEN
+  PAID
+  OVERDUE
+  VOID
+}
+
+enum OnboardingStatus {
+  NOT_STARTED
+  PENDING
+  COMPLETE
+  REJECTED
+}
+
+enum PaymentStatus {
+  REQUIRES_PAYMENT_METHOD
+  REQUIRES_CONFIRMATION
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}
+
+model Opportunity {
+  id            String            @id @default(cuid())
+  salesforceId  String            @unique
+  name          String
+  accountName   String
+  accountId     String?
+  hostEmail     String
+  amount        Float
+  stage         String
+  closeDate     DateTime?
+  status        OpportunityStatus @default(PENDING)
+  errorMessage  String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  invoice       Invoice?
+  stripeAccount StripeAccount?
+  payments      PaymentRecord[]
+  auditLogs     AuditLog[]
+
+  @@index([status])
+  @@index([salesforceId])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  netsuiteId    String        @unique
+  opportunityId String        @unique
+  dueDate       DateTime
+  totalAmount   Float
+  lineItems     Json
+  status        InvoiceStatus @default(OPEN)
+  fetchedAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  opportunity   Opportunity   @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  payments      PaymentRecord[]
+
+  @@index([netsuiteId])
+  @@index([opportunityId])
+}
+
+model StripeAccount {
+  id               String          @id @default(cuid())
+  opportunityId    String          @unique
+  stripeAccountId  String          @unique
+  onboardingStatus OnboardingStatus @default(NOT_STARTED)
+  onboardingUrl    String?
+  detailsSubmitted Boolean         @default(false)
+  chargesEnabled   Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  opportunity      Opportunity     @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([stripeAccountId])
+  @@index([opportunityId])
+}
+
+model PaymentRecord {
+  id                     String        @id @default(cuid())
+  opportunityId          String
+  invoiceId              String?
+  stripePaymentIntentId  String        @unique
+  amount                 Float
+  currency               String        @default("usd")
+  status                 PaymentStatus @default(REQUIRES_PAYMENT_METHOD)
+  retryCount             Int           @default(0)
+  paidAt                 DateTime?
+  failureMessage         String?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  opportunity            Opportunity   @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  invoice                Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@index([opportunityId])
+  @@index([stripePaymentIntentId])
+}
+
+model AuditLog {
+  id            String      @id @default(cuid())
+  opportunityId String
+  event         String
+  metadata      Json?
+  level         String      @default("info")
+  createdAt     DateTime    @default(now())
+
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([opportunityId])
+  @@index([createdAt])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("analyst")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

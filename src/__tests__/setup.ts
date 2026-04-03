@@ -1,0 +1,21 @@
+// Set test env vars before any module loads
+process.env['NODE_ENV'] = 'test';
+process.env['JWT_SECRET'] = 'test-secret-key-minimum-32-characters-long';
+process.env['DATABASE_URL'] = 'postgresql://postgres:postgres@localhost:5432/stripe_ar_service_test';
+process.env['REDIS_URL'] = 'redis://localhost:6379';
+process.env['SALESFORCE_CLIENT_ID'] = 'test_sf_client_id';
+process.env['SALESFORCE_CLIENT_SECRET'] = 'test_sf_client_secret';
+process.env['SALESFORCE_REDIRECT_URI'] = 'http://localhost:3001/callback';
+process.env['SALESFORCE_INSTANCE_URL'] = 'https://test.salesforce.com';
+process.env['NETSUITE_ACCOUNT_ID'] = 'test_account';
+process.env['NETSUITE_CONSUMER_KEY'] = 'test_consumer_key';
+process.env['NETSUITE_CONSUMER_SECRET'] = 'test_consumer_secret';
+process.env['NETSUITE_TOKEN_KEY'] = 'test_token_key';
+process.env['NETSUITE_TOKEN_SECRET'] = 'test_token_secret';
+process.env['NETSUITE_BASE_URL'] = 'https://test.netsuite.com';
+process.env['STRIPE_SECRET_KEY'] = 'sk_test_placeholder_key_for_testing_only';
+process.env['STRIPE_PUBLISHABLE_KEY'] = 'pk_test_placeholder_key_for_testing_only';
+process.env['STRIPE_WEBHOOK_SECRET'] = 'whsec_test_placeholder_webhook_secret';
+process.env['FRONTEND_URL'] = 'http://localhost:5173';
+process.env['CORS_ORIGIN'] = 'http://localhost:5173';
+process.env['API_BASE_URL'] = 'http://localhost:3001';
