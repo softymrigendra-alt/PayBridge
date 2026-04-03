@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 const DEMO_JWT_SECRET = 'demo-secret-key-minimum-32-characters-ok';
-const DEMO_USER = { id: 'demo_user_1', email: 'admin@arservice.com', name: 'Admin User', role: 'admin' };
+const DEMO_USER = { id: 'demo_user_1', email: 'admin@paybridge.com', name: 'Admin User', role: 'admin' };
 
 // ── Static demo data ──────────────────────────────────────────────────────────
 
@@ -138,7 +138,7 @@ export function demoMiddleware(req: Request, res: Response, next: NextFunction) 
   // ── Auth routes ─────────────────────────────────────────────────────────────
   if (path === '/api/auth/login' && method === 'POST') {
     const { email, password } = req.body as { email?: string; password?: string };
-    if (email === 'admin@arservice.com' && password === 'admin123') {
+    if (email === 'admin@paybridge.com' && password === 'admin123') {
       return res.json({ success: true, data: { token: makeToken(), user: DEMO_USER } });
     }
     return res.status(401).json({ success: false, error: 'Invalid email or password' });

@@ -106,7 +106,7 @@ export function onboardingInviteTemplate(data: {
     </div>
     <div class="footer">
       <p>This email was sent to <a href="mailto:${data.hostEmail}">${data.hostEmail}</a></p>
-      <p>© ${new Date().getFullYear()} AR Service. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} PayBridge. All rights reserved.</p>
     </div>
   </div>
 </body>

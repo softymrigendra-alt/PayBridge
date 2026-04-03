@@ -1,7 +1,7 @@
 {
-  "name": "stripe-ar-service",
+  "name": "paybridge",
   "version": "1.0.0",
-  "description": "Stripe Accounts Receivable Service integrating Salesforce, NetSuite, and Stripe",
+  "description": "PayBridge — The bridge between CRM, ERP & payments. Integrating Salesforce, NetSuite, and Stripe.",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",

@@ -1,7 +1,7 @@
 // Set test env vars before any module loads
 process.env['NODE_ENV'] = 'test';
 process.env['JWT_SECRET'] = 'test-secret-key-minimum-32-characters-long';
-process.env['DATABASE_URL'] = 'postgresql://postgres:postgres@localhost:5432/stripe_ar_service_test';
+process.env['DATABASE_URL'] = 'postgresql://postgres:postgres@localhost:5432/paybridge_test';
 process.env['REDIS_URL'] = 'redis://localhost:6379';
 process.env['SALESFORCE_CLIENT_ID'] = 'test_sf_client_id';
 process.env['SALESFORCE_CLIENT_SECRET'] = 'test_sf_client_secret';

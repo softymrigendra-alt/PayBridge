@@ -52,8 +52,8 @@ const envSchema = z.object({
     : z.string().startsWith('whsec_', 'STRIPE_WEBHOOK_SECRET must start with whsec_'),
 
   SENDGRID_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().email().default('noreply@arservice.com'),
-  EMAIL_FROM_NAME: z.string().default('AR Service'),
+  EMAIL_FROM: z.string().email().default('noreply@paybridge.com'),
+  EMAIL_FROM_NAME: z.string().default('PayBridge'),
 
   FRONTEND_URL: z.string().url().default('http://localhost:5173'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),

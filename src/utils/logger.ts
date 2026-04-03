@@ -10,7 +10,7 @@ const logger = winston.createLogger({
     errors({ stack: true }),
     json(),
   ),
-  defaultMeta: { service: 'stripe-ar-service' },
+  defaultMeta: { service: 'paybridge' },
   transports: [
     new winston.transports.Console({
       format:

@@ -4,11 +4,11 @@ services:
   # ─── PostgreSQL ─────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
-    container_name: ar_postgres
+    container_name: paybridge_postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: stripe_ar_service
+      POSTGRES_DB: paybridge
     ports:
       - '5432:5432'
     volumes:
@@ -22,7 +22,7 @@ services:
   # ─── Redis ──────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
-    container_name: ar_redis
+    container_name: paybridge_redis
     ports:
       - '6379:6379'
     volumes:
@@ -38,13 +38,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ar_api
+    container_name: paybridge_api
     ports:
       - '3001:3001'
     environment:
       NODE_ENV: production
       PORT: 3001
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stripe_ar_service
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/paybridge
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: 24h
@@ -65,8 +65,8 @@ services:
       STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
-      EMAIL_FROM: ${EMAIL_FROM:-noreply@arservice.com}
-      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-AR Service}
+      EMAIL_FROM: ${EMAIL_FROM:-noreply@paybridge.com}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-PayBridge}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
       API_BASE_URL: ${API_BASE_URL:-http://localhost:3001}
@@ -84,7 +84,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.frontend
-    container_name: ar_frontend
+    container_name: paybridge_frontend
     ports:
       - '80:80'
     depends_on:

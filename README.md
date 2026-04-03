@@ -1,6 +1,6 @@
-# Stripe AR Service — Accounts Receivable Platform
+# PayBridge — The bridge between CRM, ERP & payments.
 
-A production-ready Accounts Receivable platform that automates the full payment lifecycle: syncing deals from Salesforce, matching invoices in NetSuite, onboarding hosts via Stripe Connect, and collecting payments — all from a single dashboard.
+A production-ready payment pipeline platform that automates the full payment lifecycle: syncing deals from Salesforce, matching invoices in NetSuite, onboarding hosts via Stripe Connect, and collecting payments — all from a single dashboard.
 
 ## 🚀 Features
 
@@ -39,10 +39,10 @@ A production-ready Accounts Receivable platform that automates the full payment 
 ## 🛠️ How to Use
 
 ### Quick Start (Demo — no credentials needed)
-1. Visit **[https://stripe-ar-service.vercel.app](https://stripe-ar-service.vercel.app)**
+1. Visit **[https://paybridge-ar.vercel.app](https://paybridge-ar.vercel.app)**
 2. Log in with the demo credentials:
    ```
-   Email:    admin@arservice.com
+   Email:    admin@paybridge.com
    Password: admin123
    ```
 3. Explore all 4 opportunities across different pipeline stages
@@ -93,7 +93,7 @@ PENDING → Fetch Invoice → INVOICE_FETCHED → Invite Host → INVITE_SENT �
 ## 📁 File Structure
 
 ```
-stripe-ar-service/
+paybridge/
 ├── api/
 │   └── index.ts                  # Vercel serverless handler (standalone, no external deps)
 ├── frontend/
@@ -403,4 +403,4 @@ MIT — free to use and modify.
 
 ---
 
-**Built with Node.js · TypeScript · React · Prisma · Stripe · Salesforce · NetSuite 💳**
+**Built with Node.js · TypeScript · React · Prisma · Stripe · Salesforce · NetSuite**

@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Spinner } from '../components/Spinner';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@arservice.com');
+  const [email, setEmail] = useState('admin@paybridge.com');
   const [password, setPassword] = useState('admin123');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -30,10 +30,10 @@ export default function LoginPage() {
         <div className="card p-8">
           <div className="text-center mb-8">
             <div className="w-12 h-12 bg-brand-500 rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-3">
-              AR
+              PB
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">AR Service</h1>
-            <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
+            <h1 className="text-2xl font-bold text-gray-900">PayBridge</h1>
+            <p className="text-gray-500 text-sm mt-1">The bridge between CRM, ERP &amp; payments.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -45,7 +45,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-                placeholder="admin@arservice.com"
+                placeholder="admin@paybridge.com"
               />
             </div>
             <div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
           </form>
         </div>
         <p className="text-center text-xs text-gray-400 mt-4">
-          Default: admin@arservice.com / admin123
+          Default: admin@paybridge.com / admin123
         </p>
       </div>
     </div>

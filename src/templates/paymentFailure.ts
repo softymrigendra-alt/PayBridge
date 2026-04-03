@@ -83,7 +83,7 @@ export function paymentFailureTemplate(data: {
     </div>
     <div class="footer">
       <p>Questions? Reply to this email or contact your account manager.</p>
-      <p>© ${new Date().getFullYear()} AR Service. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} PayBridge. All rights reserved.</p>
     </div>
   </div>
 </body>

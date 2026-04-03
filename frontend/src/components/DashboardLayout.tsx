@@ -17,9 +17,9 @@ export default function DashboardLayout() {
         <div className="p-6 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-              AR
+              PB
             </div>
-            <span className="font-semibold text-lg">AR Service</span>
+            <span className="font-semibold text-lg">PayBridge</span>
           </div>
         </div>
 

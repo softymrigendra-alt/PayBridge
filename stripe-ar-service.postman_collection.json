@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Stripe AR Service",
-    "description": "API collection for the Stripe Accounts Receivable Service",
+    "name": "PayBridge API",
+    "description": "API collection for PayBridge — The bridge between CRM, ERP & payments.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -35,7 +35,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@arservice.com\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"email\": \"admin@paybridge.com\",\n  \"password\": \"admin123\"\n}"
             },
             "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
           }

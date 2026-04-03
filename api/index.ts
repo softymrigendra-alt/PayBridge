@@ -1,6 +1,6 @@
 /**
  * Standalone Vercel serverless handler — demo mode.
- * Implements the full AR Service API with realistic mock data.
+ * Implements the full PayBridge API with realistic mock data.
  * No database, no external SDKs — works entirely in-memory.
  */
 import type { IncomingMessage, ServerResponse } from 'http';
@@ -29,7 +29,7 @@ function verifyToken(token: string): boolean {
 }
 
 // ── Demo data ─────────────────────────────────────────────────────────────────
-const DEMO_USER = { id: 'u1', email: 'admin@arservice.com', name: 'Admin User', role: 'admin' };
+const DEMO_USER = { id: 'u1', email: 'admin@paybridge.com', name: 'Admin User', role: 'admin' };
 
 const OPPS = [
   {
@@ -150,7 +150,7 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   // Login
   if (path === '/api/auth/login' && method === 'POST') {
     const body = await getBody(req);
-    if (body['email'] === 'admin@arservice.com' && body['password'] === 'admin123') {
+    if (body['email'] === 'admin@paybridge.com' && body['password'] === 'admin123') {
       const token = makeToken({ userId: DEMO_USER.id, email: DEMO_USER.email, role: DEMO_USER.role });
       return json(res, 200, { success: true, data: { token, user: DEMO_USER } });
     }
