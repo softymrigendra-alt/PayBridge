@@ -5,6 +5,7 @@ import { opportunitiesApi, syncApi } from '../api/opportunities';
 import { Opportunity, OpportunityStatus } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Spinner } from '../components/Spinner';
+import { Tooltip } from '../components/Tooltip';
 import { format } from 'date-fns';
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
@@ -72,14 +73,16 @@ export default function OpportunitiesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Opportunities</h1>
           <p className="text-gray-500 text-sm mt-0.5">{total} total opportunities</p>
         </div>
-        <button onClick={handleSync} disabled={syncing} className="btn-primary">
-          {syncing ? <Spinner size="sm" /> : (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          )}
-          Sync Salesforce
-        </button>
+        <Tooltip content="Pull latest Closed Won deals from Salesforce CRM into the pipeline" position="left">
+          <button onClick={handleSync} disabled={syncing} className="btn-primary">
+            {syncing ? <Spinner size="sm" /> : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            )}
+            Sync Salesforce
+          </button>
+        </Tooltip>
       </div>
 
       {/* Filters */}
@@ -108,13 +111,37 @@ export default function OpportunitiesPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Opportunity</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <Tooltip content="Deal name and Salesforce ID" position="bottom">
+                    <span className="cursor-default">Opportunity</span>
+                  </Tooltip>
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Account</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Host Email</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">SF Stage</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Close Date</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <Tooltip content="Contact who receives the Stripe onboarding invite" position="bottom">
+                    <span className="cursor-default">Host Email</span>
+                  </Tooltip>
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <Tooltip content="Invoice amount to be collected via Stripe" position="bottom">
+                    <span className="cursor-default">Amount</span>
+                  </Tooltip>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <Tooltip content="Current stage of this deal in Salesforce CRM" position="bottom">
+                    <span className="cursor-default">SF Stage</span>
+                  </Tooltip>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <Tooltip content="Current stage in the PayBridge payment pipeline" position="bottom">
+                    <span className="cursor-default">Status</span>
+                  </Tooltip>
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <Tooltip content="Date the deal was marked Closed Won in Salesforce" position="bottom">
+                    <span className="cursor-default">Close Date</span>
+                  </Tooltip>
+                </th>
                 <th className="px-6 py-3" />
               </tr>
             </thead>
@@ -140,13 +167,17 @@ export default function OpportunitiesPage() {
                   >
                     <td className="px-6 py-4">
                       <p className="font-medium text-gray-900 text-sm">{opp.name}</p>
-                      <p className="text-xs text-gray-400 mt-0.5 font-mono">{opp.salesforceId}</p>
+                      <Tooltip content="Salesforce opportunity ID" position="right">
+                        <p className="text-xs text-gray-400 mt-0.5 font-mono cursor-default">{opp.salesforceId}</p>
+                      </Tooltip>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">{opp.accountName}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{opp.hostEmail}</td>
                     <td className="px-6 py-4 text-right font-semibold text-gray-900 text-sm">{fmt.format(opp.amount)}</td>
                     <td className="px-6 py-4">
-                      <span className="badge bg-gray-100 text-gray-600 text-xs">{opp.stage}</span>
+                      <Tooltip content="Deal stage as recorded in Salesforce CRM">
+                        <span className="badge bg-gray-100 text-gray-600 text-xs cursor-default">{opp.stage}</span>
+                      </Tooltip>
                     </td>
                     <td className="px-6 py-4">
                       <StatusBadge status={opp.status as OpportunityStatus} />

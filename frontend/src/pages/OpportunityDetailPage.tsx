@@ -9,6 +9,7 @@ import { InvoicePanel } from '../components/InvoicePanel';
 import { PaymentPanel } from '../components/PaymentPanel';
 import { AuditLogPanel } from '../components/AuditLog';
 import { Spinner } from '../components/Spinner';
+import { Tooltip } from '../components/Tooltip';
 import { format } from 'date-fns';
 
 type Tab = 'overview' | 'invoice' | 'payment' | 'audit';
@@ -94,16 +95,33 @@ export default function OpportunityDetailPage() {
 
   if (!opportunity) return null;
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'overview', label: 'Overview' },
-    { key: 'invoice', label: 'Invoice' },
-    { key: 'payment', label: 'Payment' },
-    { key: 'audit', label: 'Audit Log' },
+  const tabs: { key: Tab; label: string; tooltip: string }[] = [
+    { key: 'overview',  label: 'Overview',  tooltip: 'Salesforce deal details and Stripe account status' },
+    { key: 'invoice',   label: 'Invoice',   tooltip: 'NetSuite invoice line items and payment due date' },
+    { key: 'payment',   label: 'Payment',   tooltip: 'Charge the invoice amount via Stripe' },
+    { key: 'audit',     label: 'Audit Log', tooltip: 'Full timestamped event history for this opportunity' },
   ];
 
   const canFetchInvoice = opportunity.status === 'PENDING';
   const canInviteHost = opportunity.status === 'INVOICE_FETCHED';
   const canCharge = opportunity.status === 'ONBOARDING_COMPLETE';
+
+  const overviewDetails: { label: string; value: string; tooltip: string }[] = [
+    { label: 'Salesforce ID', value: opportunity.salesforceId,   tooltip: 'Unique identifier for this deal in Salesforce CRM' },
+    { label: 'Account',       value: opportunity.accountName,    tooltip: 'The company this deal belongs to' },
+    { label: 'Host Email',    value: opportunity.hostEmail,      tooltip: 'Contact who will receive the Stripe onboarding invite' },
+    { label: 'SF Stage',      value: opportunity.stage,          tooltip: 'Deal stage as recorded in Salesforce CRM' },
+    { label: 'Close Date',    value: opportunity.closeDate ? format(new Date(opportunity.closeDate), 'MMM d, yyyy') : '—', tooltip: 'Date the deal was marked Closed Won in Salesforce' },
+    { label: 'Amount',        value: fmt.format(opportunity.amount), tooltip: 'Invoice amount to be collected via Stripe' },
+    { label: 'Created',       value: format(new Date(opportunity.createdAt), 'MMM d, yyyy HH:mm'), tooltip: 'Date this opportunity was added to PayBridge' },
+  ];
+
+  const stripeDetails: { label: string; value: string; tooltip: string }[] = opportunity.stripeAccount ? [
+    { label: 'Account ID',        value: opportunity.stripeAccount.stripeAccountId,                  tooltip: 'Unique Stripe Connect account ID for this host' },
+    { label: 'Onboarding',        value: opportunity.stripeAccount.onboardingStatus,                 tooltip: 'Status of the host\'s Stripe Connect account setup' },
+    { label: 'Details Submitted', value: opportunity.stripeAccount.detailsSubmitted ? 'Yes' : 'No', tooltip: 'Whether the host has submitted business details to Stripe' },
+    { label: 'Charges Enabled',   value: opportunity.stripeAccount.chargesEnabled ? 'Yes' : 'No',   tooltip: 'Whether this Stripe account can accept and process payments' },
+  ] : [];
 
   return (
     <div className="p-8">
@@ -127,7 +145,9 @@ export default function OpportunityDetailPage() {
           </div>
           <div className="flex items-center gap-3">
             <StatusBadge status={opportunity.status} />
-            <span className="text-xl font-bold text-gray-900">{fmt.format(opportunity.amount)}</span>
+            <Tooltip content="Total invoice amount to be charged via Stripe" position="left">
+              <span className="text-xl font-bold text-gray-900 cursor-default">{fmt.format(opportunity.amount)}</span>
+            </Tooltip>
           </div>
         </div>
 
@@ -139,31 +159,39 @@ export default function OpportunityDetailPage() {
         {/* Action bar */}
         <div className="flex gap-3 mt-6 pt-6 border-t border-gray-100">
           {canFetchInvoice && (
-            <button onClick={handleFetchInvoice} disabled={actionLoading} className="btn-primary">
-              {actionLoading ? <Spinner size="sm" /> : null}
-              Fetch Invoice
-            </button>
+            <Tooltip content="Pull the matching invoice from NetSuite ERP for this account">
+              <button onClick={handleFetchInvoice} disabled={actionLoading} className="btn-primary">
+                {actionLoading ? <Spinner size="sm" /> : null}
+                Fetch Invoice
+              </button>
+            </Tooltip>
           )}
           {canInviteHost && (
-            <button onClick={handleInviteHost} disabled={actionLoading} className="btn-primary">
-              {actionLoading ? <Spinner size="sm" /> : null}
-              Invite Host
-            </button>
+            <Tooltip content="Create a Stripe Connect account and email the onboarding link to the host">
+              <button onClick={handleInviteHost} disabled={actionLoading} className="btn-primary">
+                {actionLoading ? <Spinner size="sm" /> : null}
+                Invite Host
+              </button>
+            </Tooltip>
           )}
           {opportunity.stripeAccount?.onboardingStatus === 'PENDING' && (
-            <a
-              href={opportunity.stripeAccount.onboardingUrl ?? '#'}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-secondary"
-            >
-              View Onboarding Link
-            </a>
+            <Tooltip content="Open Stripe Express onboarding portal — host must complete before payment can be collected">
+              <a
+                href={opportunity.stripeAccount.onboardingUrl ?? '#'}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-secondary"
+              >
+                View Onboarding Link
+              </a>
+            </Tooltip>
           )}
           {canCharge && (
-            <button onClick={() => setTab('payment')} className="btn-primary">
-              Proceed to Payment
-            </button>
+            <Tooltip content="Charge the invoice amount via Stripe PaymentIntent">
+              <button onClick={() => setTab('payment')} className="btn-primary">
+                Proceed to Payment
+              </button>
+            </Tooltip>
           )}
         </div>
 
@@ -178,22 +206,23 @@ export default function OpportunityDetailPage() {
       <div className="card overflow-hidden">
         <div className="flex border-b border-gray-200">
           {tabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                tab === t.key
-                  ? 'border-brand-500 text-brand-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t.label}
-              {t.key === 'audit' && opportunity.auditLogs.length > 0 && (
-                <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
-                  {opportunity.auditLogs.length}
-                </span>
-              )}
-            </button>
+            <Tooltip key={t.key} content={t.tooltip} position="bottom">
+              <button
+                onClick={() => setTab(t.key)}
+                className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  tab === t.key
+                    ? 'border-brand-500 text-brand-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {t.label}
+                {t.key === 'audit' && opportunity.auditLogs.length > 0 && (
+                  <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+                    {opportunity.auditLogs.length}
+                  </span>
+                )}
+              </button>
+            </Tooltip>
           ))}
         </div>
 
@@ -203,17 +232,11 @@ export default function OpportunityDetailPage() {
               <div>
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Opportunity Details</h3>
                 <dl className="space-y-2">
-                  {[
-                    ['Salesforce ID', opportunity.salesforceId],
-                    ['Account', opportunity.accountName],
-                    ['Host Email', opportunity.hostEmail],
-                    ['SF Stage', opportunity.stage],
-                    ['Close Date', opportunity.closeDate ? format(new Date(opportunity.closeDate), 'MMM d, yyyy') : '—'],
-                    ['Amount', fmt.format(opportunity.amount)],
-                    ['Created', format(new Date(opportunity.createdAt), 'MMM d, yyyy HH:mm')],
-                  ].map(([label, value]) => (
+                  {overviewDetails.map(({ label, value, tooltip }) => (
                     <div key={label} className="flex justify-between text-sm">
-                      <dt className="text-gray-500">{label}</dt>
+                      <Tooltip content={tooltip} position="right">
+                        <dt className="text-gray-500 cursor-default">{label}</dt>
+                      </Tooltip>
                       <dd className="font-medium text-gray-900">{value}</dd>
                     </div>
                   ))}
@@ -223,14 +246,11 @@ export default function OpportunityDetailPage() {
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Stripe Account</h3>
                 {opportunity.stripeAccount ? (
                   <dl className="space-y-2">
-                    {[
-                      ['Account ID', opportunity.stripeAccount.stripeAccountId],
-                      ['Onboarding', opportunity.stripeAccount.onboardingStatus],
-                      ['Details Submitted', opportunity.stripeAccount.detailsSubmitted ? 'Yes' : 'No'],
-                      ['Charges Enabled', opportunity.stripeAccount.chargesEnabled ? 'Yes' : 'No'],
-                    ].map(([label, value]) => (
+                    {stripeDetails.map(({ label, value, tooltip }) => (
                       <div key={label} className="flex justify-between text-sm">
-                        <dt className="text-gray-500">{label}</dt>
+                        <Tooltip content={tooltip} position="right">
+                          <dt className="text-gray-500 cursor-default">{label}</dt>
+                        </Tooltip>
                         <dd className="font-medium text-gray-900">{value}</dd>
                       </div>
                     ))}
@@ -248,10 +268,12 @@ export default function OpportunityDetailPage() {
               : <div className="text-center py-8">
                   <p className="text-gray-400 text-sm mb-4">No invoice fetched yet</p>
                   {canFetchInvoice && (
-                    <button onClick={handleFetchInvoice} disabled={actionLoading} className="btn-primary">
-                      {actionLoading ? <Spinner size="sm" /> : null}
-                      Fetch Invoice from NetSuite
-                    </button>
+                    <Tooltip content="Pull the matching invoice from NetSuite ERP for this account">
+                      <button onClick={handleFetchInvoice} disabled={actionLoading} className="btn-primary">
+                        {actionLoading ? <Spinner size="sm" /> : null}
+                        Fetch Invoice from NetSuite
+                      </button>
+                    </Tooltip>
                   )}
                 </div>
           )}
@@ -274,10 +296,14 @@ export default function OpportunityDetailPage() {
                       <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Payment History</h3>
                       {opportunity.payments.map((p) => (
                         <div key={p.id} className="flex justify-between text-sm py-2 border-b border-gray-100">
-                          <span className="font-mono text-xs text-gray-500">{p.stripePaymentIntentId}</span>
-                          <span className={`badge ${p.status === 'SUCCEEDED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {p.status}
-                          </span>
+                          <Tooltip content="Stripe PaymentIntent ID for this transaction" position="right">
+                            <span className="font-mono text-xs text-gray-500 cursor-default">{p.stripePaymentIntentId}</span>
+                          </Tooltip>
+                          <Tooltip content={p.status === 'SUCCEEDED' ? 'Payment collected successfully' : 'Payment attempt failed'}>
+                            <span className={`badge cursor-default ${p.status === 'SUCCEEDED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                              {p.status}
+                            </span>
+                          </Tooltip>
                           <span className="font-medium">{fmt.format(p.amount)}</span>
                         </div>
                       ))}
