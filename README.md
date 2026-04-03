@@ -1,7 +1,5 @@
 # PayBridge — The bridge between CRM, ERP & payments.
 
-> **Middleware platform connecting Salesforce, NetSuite & Stripe into one automated financial workflow.**
-
 ## 📌 Problem Statement
 Organizations struggle with disconnected CRM, ERP, and payment systems — forcing finance teams into manual reconciliation, error-prone data exports, and a lack of real-time visibility into their revenue pipeline.
 
@@ -17,18 +15,17 @@ PayBridge acts as a middleware orchestration layer that bridges Salesforce (CRM)
 - **Core Value:** One unified workflow from closed deal → invoice → onboarding → payment
 
 ## 📊 Impact & Metrics (Simulated)
-- 🔄 Reduced manual reconciliation effort by **60%**
-- ⏱️ Improved end-to-end financial workflow efficiency by **40%**
+- 🔄 Reduced manual reconciliation effort by 60%
+- ⏱️ Improved end-to-end financial workflow efficiency by 40%
 - 📊 Enabled near real-time visibility across the full payment pipeline
 - ⚡ Rapid prototype built using AI-assisted development (Cursor + Claude)
 
 ## 🔮 Future Enhancements
 - Real-time revenue dashboards with drill-down analytics
 - AI-based anomaly detection for failed payments and overdue invoices
-- Multi-currency support via Stripe currency conversion
 - Role-based access for finance, ops, and admin teams
 
----
+-------------------------------------------------
 
 A production-ready payment pipeline platform that automates the full payment lifecycle: syncing deals from Salesforce, matching invoices in NetSuite, onboarding hosts via Stripe Connect, and collecting payments — all from a single dashboard.
 
